@@ -4,20 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-- `pnpm dev` – start development server
+- `pnpm dev` – start development server (hot reload)
 - `pnpm build && pnpm serve` – production build and serve
 - `pnpm lint` – ESLint formatting and running
 - `pnpm test` – execute tests
 
 ## Architecture Overview
 
-**Next.js 16 application** with the following structure:
+**Next.js 16 application** with offline-first architecture:
 
+```
 src/
 ├── app/
 │   ├── layout.tsx          # Root layout with Geist fonts, Tailwind setup
-│   ├── globals.css         # Global styles and custom utilities
-│   └── page.tsx            # Main entry point (handles document routing)
+│   ├── globals.css         # Global styles + custom utilities
+│   └── page.tsx            # Main entry point (handles routing)
 ├── next.config.ts          # Production build configuration
 │   - Enables server-side rendering
 │   - Configures API routes
@@ -25,18 +26,13 @@ src/
 ├── tsconfig.json           # TypeScript configuration
 └── package.json            # Dependencies and scripts
 
-**Additional files**: `src/api/file.ts` - File handling API for document operations
+# Additional: src/api/file.ts (file handling API)
+```
 
-## Project Configuration
-
-### Current State
-- **Routing Structure**: Single `/` page that dynamically handles document type via URL parameters (`/doc?id=1`, `/excel?id=2`, etc.)
-
-### Target Architecture (Refactoring Goal)
-Explicitly separated routes:
-├── /doc/       → Document editor (.docx support)
-├── /excel/     → Spreadsheet editor (.xlsx support)
-└── /ppt/       → Presentation editor (.pptx support)
+**Target Routes**:
+- `/doc/` → Document editor (.docx support)
+- `/excel/` → Spreadsheet editor (.xlsx support)
+- `/ppt/` → Presentation editor (.pptx support)
 
 ## Dependencies
 
@@ -48,6 +44,100 @@ Explicitly separated routes:
 ### Styling
 - **Tailwind CSS** 4.x - Utility-first styling with custom theme setup
 
+## Offline-First Implementation
+
+### Data Storage Strategy
+
+1. **IndexedDB** for document content (no server storage)
+   - Store each document's binary data locally as BLOBs
+   - Handle large documents efficiently
+   - No external file servers required
+
+2. **localStorage** for metadata and session state
+   - Client ID / user IDs
+   - Sync status flags
+   - Last accessed timestamps
+
+3. **WebSocket messages** use localStorage with `to:` field for recipient identification
+
+### WebSocket Handling
+
+1. Initialize connection on page mount in page.tsx or dedicated component
+2. Handle connection states:
+   - `connected`: Messages can be sent/received
+   - `disconnected`: Connection failed, reconnection attempt
+   - `connecting`: Attempting to connect to server
+3. Send messages with format: `{ type, data, to: recipientId }`
+
+## Testing Strategy
+
+### Unit Tests (Jest)
+
+```typescript
+// tests/__mocks__/websocketServer.ts
+import { createConnection } from './websocket-server';
+
+describe('WebSocket Server', () => {
+  let conn: any;
+
+  beforeEach(async () => {
+    // Setup WebSocket connection mock
+    conn = await createConnection();
+    server.listen(conn);
+  });
+
+  afterEach(async () => {
+    if (conn) {
+      server.close();
+      conn.destroy();
+    }
+  });
+
+  it('should handle incoming messages', async () => {
+    // Mock message handlers
+    expect(() => { /* test */ }).toThrow();
+  });
+
+  it('should handle outgoing messages with recipient field', async () => {
+    const mockId = 'test-recipient-id';
+    const msg = { type: 'sync', data, to: mockId };
+    // Verify message format validation
+  });
+});
+```
+
+### Integration Tests (React Testing Library)
+
+```typescript
+// tests/effective-offline-editor.test.tsx
+import { render, screen } from '@testing-library/react';
+
+describe('Offline Editor App', () => {
+  it('should display document list with three types', () => {
+    render(<MyApp />);
+    expect(screen.getByText(/Documents/)).toBeInTheDocument();
+    expect(screen.getByText(/Docs/)).toBeInTheDocument();
+    expect(screen.getByText(/Exce/)).toBeInTheDocument();
+  });
+
+  it('should accept user ID for notifications', () => {
+    const mockId = 'test-recipient-id';
+    render(<MyApp onMessage={handleMessage} />);
+    
+    screen.getByRole('button').click();
+    
+    expect(screen.getByLabelText(/recipient/)).toBeInTheDocument();
+  });
+
+  it('should handle disconnected state properly', () => {
+    const mockWs = jest.fn().mockImplementation(() => null);
+    render(<MyApp ws={mockWs} />);
+    
+    expect(mockWs).toBeDefined();
+  });
+});
+```
+
 ## Key Files to Understand and Modify
 
 | File | Purpose | Changes Needed |
@@ -56,30 +146,6 @@ Explicitly separated routes:
 | `src/app/globals.css` | Global styles + Tailwind integration | Add document-specific utilities |
 | `src/app/page.tsx` | Main entry point for routing | Separate `/doc/`, `/excel/`, `/ppt/` routes |
 | `next.config.ts` | Build configuration | Remove Vercel-specific config if not needed |
-
-## Offline-First Implementation Notes
-
-1. **Data Storage**:
-    - Use browser IndexedDB for document content (no server storage)
-    - Use localStorage for metadata and session state
-    - No external file servers required
-
-2. **WebSocket Integration**:
-    - Connect to VPS-hosted Socket.io server for real-time sync
-    - Client-side WebSocket handling in `src/app/page.tsx` or dedicated component
-    - Broadcast messages only to matching recipient IDs
-
-3. **Document Parsing**:
-    - **.docx**: Use native Node.js ZIP parsing (no external libraries)
-    - **.xlsx**: Parse XML directly from ArrayBuffer/Buffer
-    - **.pptx**: Similar approach to .xlsx with XML handling
-
-## Authentication Flow
-
-1. Generate unique client ID on initial app load
-2. Store in localStorage for session management
-3. Include in WebSocket messages via `to: recipient-id` field
-4. Broadcast validation at server level (if backend exists)
 
 ## Deployment Requirements
 
@@ -90,6 +156,7 @@ Explicitly separated routes:
 - **Storage**: 10GB+ for document storage
 
 ### Dockerized Deployment (Recommended)
+
 ```bash
 # Build Next.js locally first
 pnpm build
@@ -104,10 +171,11 @@ Testing Strategy
 2. Production build: pnpm build && pnpm serve
 3. Test coverage: Ensure all routing paths work correctly (/doc, /excel, /ppt)
 4. Offline mode: Disconnect network and verify localStorage persistence
+```
 
-Important Notes
+## Important Notes
 
-- Current page uses URL-based document type detection; refactor to explicit routes
-- No third-party document parsing libraries needed (native Node.js APIs suffice)
-- Keep the existing Next.js 16 setup as base, just restructure routing logic
-- All data persistence is client-side (IndexedDB + localStorage only)
+1. **No third-party document parsing libraries** needed - use native Node.js APIs since documents are stored locally
+2. **All client-side operations** should be optimized for large IndexedDB records (BLOBs)
+3. **WebSocket reconnection logic** must handle network partitions gracefully
+4. **Session tokens** should use UUIDv4 format to avoid conflicts
