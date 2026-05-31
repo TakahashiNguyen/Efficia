@@ -129,48 +129,4 @@ Offer "Chain-of-Thought Enhancement" as an optional improvement when showing sug
 | Code | `"Outline your approach and data structures before writing any code."` |
 | Decision-making | `"List pros and cons, then state your recommendation with justification."` |
  
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-B
-B
-B
-B
-B
-B
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
-A
 **Why it works:** Chain-of-Thought forces the AI to externalize its reasoning process. This reduces hallucination (the AI catches its own errors mid-reasoning), makes outputs easier to verify, and produces more structured answers. Studies show CoT improves accuracy on complex tasks by 20–40%.
