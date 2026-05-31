@@ -3,131 +3,111 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Commands
-- `pnpm dev` – start dev server (hot reload)
+
+- `pnpm dev` – start development server
 - `pnpm build && pnpm serve` – production build and serve
-- `pnpm test -- --watch` – run tests under watch (if available)
+- `pnpm lint` – ESLint formatting and running
+- `pnpm test` – execute tests
 
-## Architecture
-Next.js 13+ app with API routes (`src/api/file.ts`) serving compiled bundles via `/public/<id>`. Real-time sync via Socket.io in `websocket-server/`. Shared metadata stored in `metadata.json`.
+## Architecture Overview
 
-## Key Files
-- `src/app/page.tsx` – entry for each document type.
-- `src/utils/WebSocketConnector.tsx` – client socket handling.
-- `src/api/file.ts` – API route (load/edit/upload).
-- `src/components/ui/*` – Tailwind UI components.
+**Next.js 16 application** with the following structure:
 
-# Context
-User wants to build an offline-first web application that mimics Microsoft Word, Excel, and PowerPoint functionality. The app should work fully offline and be shareable without storing data on a server - all data lives locally in the browser.
+src/
+├── app/
+│   ├── layout.tsx          # Root layout with Geist fonts, Tailwind setup
+│   ├── globals.css         # Global styles and custom utilities
+│   └── page.tsx            # Main entry point (handles document routing)
+├── next.config.ts          # Production build configuration
+│   - Enables server-side rendering
+│   - Configures API routes
+│   - Sets up SEO metadata
+├── tsconfig.json           # TypeScript configuration
+└── package.json            # Dependencies and scripts
 
-## Current State
-- Next.js 16 project already exists with TypeScript and Tailwind CSS configured
-- Basic structure has `src/app/` directory (currently uses generic `/` page)
-- Dependencies: next, react, react-dom, tailwindcss, typescript, eslint-config-next
+**Additional files**: `src/api/file.ts` - File handling API for document operations
 
-## Routing Structure (Current → Target)
-**Current**: Single `/` page that dynamically handles document type via URL parameters  
-**Target**: Explicitly separated routes for each document type:
-- `/doc/` → Document editor (.docx support)
-- `/excel/` → Spreadsheet editor (.xlsx support)
-- `/ppt/` → Presentation editor (.pptx support)
+## Project Configuration
 
-## Requirements
-1. Offline-first architecture - no external file server or cloud storage
-2. Real-time collaborative editing via WebSocket (hosted on your VPS)
-3. Support for Word (.docx), Excel (.xlsx), PowerPoint (.pptx) formats
-4. All data stored locally in browser (IndexedDB, localStorage)
-5. Self-hostable on your own VPS - no third-party cloud dependencies
-6. **Client authentication via unique ID** - Users must enter their ID to send/receive notifications
+### Current State
+- **Routing Structure**: Single `/` page that dynamically handles document type via URL parameters (`/doc?id=1`, `/excel?id=2`, etc.)
 
-## Tech Stack (No Third-Party Online APIs)
-```json
-{
-  "frontend": {
-    "Next.js 16",      // App Router, File System API
-    "React 19",        // UI components
-    "TypeScript 5.9"   // Type safety
-  },
-  "styling": {
-    "Tailwind CSS 4.3" // Utility-first styling
-  },
-  "storage": {
-    "IndexedDB",       // Browser database (offline data)
-    "Web Storage API"  // Fallback for small data
-  },
-  "real-time": {
-    "Socket.io-client" // WebSocket client (connects to your VPS server)
-  },
-  "document parsing": {
-    "ZIP.js",          // Extract .docx/.xlsx/.pptx archives
-    "xml2js",          // Parse XML files inside archives
-    "PapaParse"        // Parse Excel formulas
-  }
-}
-```
+### Target Architecture (Refactoring Goal)
+Explicitly separated routes:
+├── /doc/       → Document editor (.docx support)
+├── /excel/     → Spreadsheet editor (.xlsx support)
+└── /ppt/       → Presentation editor (.pptx support)
 
-## Authentication Flow (Client ID Based)
-1. User opens app → Generates unique client ID (UUID or random string)
-2. Client displays ID for sharing with collaborators
-3. To send notification to another user:
-   - Enter recipient's ID in the UI
-   - Send WebSocket message with `to: "recipient-id"` field
-4. Server broadcasts messages only to matching recipient IDs
+## Dependencies
 
-## Deployment (Self-Hosted on Your Own VPS)
-### Docker Containerized Deployment
+### Frontend Stack
+- **Next.js**: "^16.2.6" - App Router, Server Components
+- **React**: "^19.x" - UI components
+- **TypeScript**: "^5.x" - Type safety
 
-**Recommended: Single Docker container with embedded Next.js + Socket.io server**
+### Styling
+- **Tailwind CSS** 4.x - Utility-first styling with custom theme setup
 
-```dockerfile
-# Dockerfile
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN pnpm install --frozen-lockfile
-COPY . .
-RUN pnpm build
+## Key Files to Understand and Modify
 
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=builder /app/out ./out
-COPY --from=builder /app/node_modules ./node_modules
-EXPOSE 3001
-CMD ["node", "src/lib/websocket-server.js"]
-```
+| File | Purpose | Changes Needed |
+|------|---------|----------------|
+| `src/app/layout.tsx` | Layout configuration with Geist fonts | Update metadata, adjust body styles |
+| `src/app/globals.css` | Global styles + Tailwind integration | Add document-specific utilities |
+| `src/app/page.tsx` | Main entry point for routing | Separate `/doc/`, `/excel/`, `/ppt/` routes |
+| `next.config.ts` | Build configuration | Remove Vercel-specific config if not needed |
 
-**Docker Compose (Frontend + Backend)**
-```yaml
-version: '3.8'
-services:
-  app:
-    build: .
-    ports:
-      - "3001:3001"
-    environment:
-      PORT: 3001
-      HOST: 0.0.0.0
-```
+## Offline-First Implementation Notes
 
-**Run:** `docker-compose up -d`
+1. **Data Storage**:
+    - Use browser IndexedDB for document content (no server storage)
+    - Use localStorage for metadata and session state
+    - No external file servers required
 
-### VPS Requirements
-- **CPU**: 2 cores minimum (for Socket.io server)
-- **RAM**: 2GB minimum (optimized for static files + lightweight Node.js server)
-- **Storage**: 10GB+ (document storage in IndexedDB is client-side only)
+2. **WebSocket Integration**:
+    - Connect to VPS-hosted Socket.io server for real-time sync
+    - Client-side WebSocket handling in `src/app/page.tsx` or dedicated component
+    - Broadcast messages only to matching recipient IDs
+
+3. **Document Parsing**:
+    - **.docx**: Use native Node.js ZIP parsing (no external libraries)
+    - **.xlsx**: Parse XML directly from ArrayBuffer/Buffer
+    - **.pptx**: Similar approach to .xlsx with XML handling
+
+## Authentication Flow
+
+1. Generate unique client ID on initial app load
+2. Store in localStorage for session management
+3. Include in WebSocket messages via `to: recipient-id` field
+4. Broadcast validation at server level (if backend exists)
+
+## Deployment Requirements
+
+### VPS Specifications
+- **CPU**: 2+ cores minimum (for Socket.io server)
+- **RAM**: 2GB minimum
 - **Network**: Public IP for WebSocket access
+- **Storage**: 10GB+ for document storage
 
-### Deployment Commands
+### Dockerized Deployment (Recommended)
 ```bash
-# Build Next.js app locally first
+# Build Next.js locally first
 pnpm build
 
-# Copy to VPS and run Docker container
+# Deploy to VPS and run WebSocket server
 scp -r out/ user@your-vps:/var/www/efficia
 ssh user@your-vps "docker-compose up -d"
-```
 
-## Verification
-1. Run dev server: `pnpm dev`
-2. Open in 2+ browser tabs to test real-time sync
-3. Test offline mode by disconnecting network
-4. Verify data persists after page refresh (IndexedDB)
+Testing Strategy
+
+1. Local development: pnpm dev for hot reload testing
+2. Production build: pnpm build && pnpm serve
+3. Test coverage: Ensure all routing paths work correctly (/doc, /excel, /ppt)
+4. Offline mode: Disconnect network and verify localStorage persistence
+
+Important Notes
+
+- Current page uses URL-based document type detection; refactor to explicit routes
+- No third-party document parsing libraries needed (native Node.js APIs suffice)
+- Keep the existing Next.js 16 setup as base, just restructure routing logic
+- All data persistence is client-side (IndexedDB + localStorage only)
