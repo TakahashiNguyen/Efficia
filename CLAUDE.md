@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm build && pnpm serve` – production build and serve
 - `pnpm lint` – ESLint formatting and running
 - `pnpm test` – execute tests
+- `pnpm run test:watch` – watch mode for testing
 
 ## Architecture Overview
 
@@ -24,9 +25,10 @@ src/
 │   - Configures API routes
 │   - Sets up SEO metadata
 ├── tsconfig.json           # TypeScript configuration
-└── package.json            # Dependencies and scripts
-
-# Additional: src/api/file.ts (file handling API)
+├── package.json            # Dependencies and scripts
+└── src/
+    ├── api/
+    │   └── file.ts         # File handling API
 ```
 
 **Target Routes**:
