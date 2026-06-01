@@ -8,7 +8,6 @@
 		"vscode": {
 			"extensions": [
 				"PeterSchmalfeldt.explorer-exclude",
-				"Anthropic.claude-code",
 				"vscodevim.vim",
 				"PKief.material-icon-theme"
 			]
