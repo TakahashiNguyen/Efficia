@@ -9,7 +9,8 @@
 			"extensions": [
 				"PeterSchmalfeldt.explorer-exclude",
 				"vscodevim.vim",
-				"PKief.material-icon-theme"
+				"PKief.material-icon-theme",
+				"ms-python.python"
 			]
 		}
 	}

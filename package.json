@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "vibe": "aider --model lm_studio/unsloth/qwen3.5-2b --suggest-shell-commands --no-show-model-warnings"
   },
   "dependencies": {
     "next": "16.2.6",
