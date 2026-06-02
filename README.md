@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Efficia - Professional Offline-First Document Editor
 
-## Getting Started
+Efficia is a professional, collaborative, and offline-first document editor designed to provide a Google Docs-like experience without requiring a central data server for document storage.
 
-First, run the development server:
+## 🚀 Key Features
+
+- **Offline-First Architecture**: Documents are stored locally in the browser using IndexedDB, ensuring instant access and full functionality without an internet connection.
+- **Real-time Collaboration**: Powered by WebRTC (PeerJS), allowing users to collaborate on the same document in real-time without a centralized database.
+- **Professional Editor**: A rich-text editing experience built with Tiptap/ProseMirror, featuring a professional A4 page layout.
+- **File Management**: A dedicated document browser for creating, organizing, and deleting collaborative files.
+- **Automatic Versioning**: Fully automated release management using `semantic-release`.
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **UI**: React 19, Tailwind CSS 4.0, Shadcn UI
+- **Editor**: Tiptap / ProseMirror
+- **Storage**: IndexedDB (via native API)
+- **Communication**: WebRTC / PeerJS
+- **Package Manager**: pnpm
+
+## 📦 Getting Started
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Production Build
 
-## Learn More
+```bash
+pnpm build
+pnpm start
+```
 
-To learn more about Next.js, take a look at the following resources:
+## ⚙️ Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The project is configured for static export and can be deployed to GitHub Pages or any static hosting provider.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **CI/CD**: Automated via GitHub Actions.
+- **Release Process**: Uses `semantic-release` using a Deploy Key for branch protection bypass and `GITHUB_TOKEN` for API releases.
+- **Deployment**: Triggered automatically after a successful release on the `main` branch.

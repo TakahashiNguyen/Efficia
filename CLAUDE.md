@@ -7,8 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm dev` – start development server (hot reload)
 - `pnpm build && pnpm serve` – production build and serve
 - `pnpm lint` – ESLint formatting and running
-- `pnpm test` – execute tests
-- `pnpm run test:watch` – watch mode for testing
+- `pnpm release` – trigger semantic-release
 
 ## Architecture Overview
 
