@@ -75,7 +75,7 @@ export default function Home() {
             <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`} />
             {connected ? 'Collaborating' : 'Offline'}
           </div>
-          <span className="text-xs px-2 py-1 bg-muted rounded">Room: {roomId}</span>
+          <span className="text-xs px-2 py-1 bg-muted rounded">Room: {roomId || 'None'}</span>
         </div>
       </header>
 
@@ -83,7 +83,7 @@ export default function Home() {
         {currentDocument ? (
           <DocumentEditor
             document={currentDocument}
-            roomId={roomId}
+            roomId={roomId || ''}
             clientId={clientId}
             onConnected={(peerId) => console.log(`Connected to peer: ${peerId}`)}
             onDisconnected={(peerId) => console.log(`Disconnected from peer: ${peerId}`)}

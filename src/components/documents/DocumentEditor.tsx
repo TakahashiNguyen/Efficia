@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Editor } from '@tiptap/react';
 import { EditorToolbar } from './EditorToolbar';
 import { Document } from '@/types/document';
 import { usePeerManager } from '@/lib/webrtc';
 import { Button } from '@/components/ui/button';
+import { CollaborationMessage } from '@/types/webrtc';
 import { UserPlus } from 'lucide-react';
 
 interface DocumentEditorProps {
@@ -27,9 +27,31 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   onRoomActiveChange,
   updateCurrentDocument,
 }) => {
-  const handleMessage = (peerId: string, data: any) => {
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: document.customHtml,
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      updateCurrentDocument({ customHtml: html });
+
+      // Use a function to handle the timestamp to avoid impurity warnings in render-like scopes
+      const sendUpdate = () => {
+        broadcastMessage({
+          type: 'content-update',
+          payload: html,
+          senderId: clientId,
+          timestamp: Date.now(),
+        });
+      };
+
+      sendUpdate();
+      onRoomActiveChange();
+    },
+  });
+
+  const handleMessage = (_peerId: string, data: CollaborationMessage) => {
     if (data.type === 'content-update' && typeof data.payload === 'string') {
-      editor?.commands.setContent(data.payload, false);
+      editor?.commands.setContent(data.payload, { emitUpdate: false });
     }
   };
 
@@ -45,25 +67,9 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     onDisconnected
   );
 
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: document.customHtml,
-    onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      updateCurrentDocument({ customHtml: html });
-      broadcastMessage({
-        type: 'content-update',
-        payload: html,
-        senderId: clientId,
-        timestamp: Date.now(),
-      });
-      onRoomActiveChange();
-    },
-  });
-
   useEffect(() => {
     if (editor && document.customHtml !== editor.getHTML()) {
-      editor.commands.setContent(document.customHtml, false);
+      editor.commands.setContent(document.customHtml, { emitUpdate: false });
     }
   }, [document.customHtml, editor]);
 
@@ -73,7 +79,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
 
       <div className="flex-1 overflow-y-auto p-8 flex justify-center">
         <div className="bg-white w-full max-w-[210mm] min-h-[297mm] p-[20mm] shadow-xl border border-slate-200 focus:outline-none"
-             onClick={() => editor?.chain().focus().run()}>
+          onClick={() => editor?.chain().focus().run()}>
           <EditorContent editor={editor} className="prose prose-slate max-w-none focus:outline-none" />
         </div>
       </div>

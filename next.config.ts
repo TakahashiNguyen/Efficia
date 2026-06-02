@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
   output: 'export',
@@ -7,10 +6,7 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   turbopack: {},
-  basePath: '/Efficia/'
+  basePath: '/Efficia'
 };
 
-export default withPWA({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development', // Disable PWA in development to avoid caching issues
-})(nextConfig);
+export default nextConfig;
