@@ -15,9 +15,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: |
-      github.ref == 'refs/heads/main' &&
-      github.event_name == 'workflow_run' && 
-      github.event.workflow_run.conclusion == 'success'
+      (github.ref == 'refs/heads/main' && github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/dev-'))
     steps:
       - name: Checkout
         uses: actions/checkout@v4
