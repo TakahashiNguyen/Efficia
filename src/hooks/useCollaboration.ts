@@ -8,12 +8,17 @@ export interface CollaborationState {
   clientId: string;
 }
 
-export function useCollaboration(): CollaborationState {
+export function useCollaboration(roomId?: string): CollaborationState {
   const clientId = useRef(generateClientId());
   const [state, setState] = useState<CollaborationState>({
     connected: false,
+    roomId: roomId || 'default-room',
     clientId: clientId.current
   });
+
+  useEffect(() => {
+    setState(prev => ({ ...prev, roomId: roomId || 'default-room' }));
+  }, [roomId]);
 
   useEffect(() => {
     const handleRoomJoin = (event: CustomEvent<RoomJoinEventDetail>) => {

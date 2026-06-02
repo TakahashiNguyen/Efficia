@@ -65,28 +65,32 @@ export function useDocument() {
     });
   }, [currentDocumentId]);
 
-  const deleteCurrentDocument = async (): Promise<boolean> => {
-    if (!currentDocumentId) return false;
-
+  const deleteDocument = async (id: string): Promise<boolean> => {
     try {
-      const success = await removeDocument(currentDocumentId);
+      const success = await removeDocument(id);
 
       if (success) {
-        const remainingDocs = documents.filter(d => d.id !== currentDocumentId);
+        const remainingDocs = documents.filter(d => d.id !== id);
         setDocuments(remainingDocs);
 
-        if (remainingDocs.length > 0) {
-          setCurrentDocumentId(remainingDocs[0].id);
-        } else {
-          setCurrentDocumentId(null);
+        if (id === currentDocumentId) {
+          if (remainingDocs.length > 0) {
+            setCurrentDocumentId(remainingDocs[0].id);
+          } else {
+            setCurrentDocumentId(null);
+          }
         }
         return true;
       }
     } catch (error) {
-      console.error('Failed to delete document:', error);
+      console.error(`Failed to delete document ${id}:`, error);
     }
 
     return false;
+  };
+
+  const deleteCurrentDocument = async (): Promise<boolean> => {
+    return deleteDocument(currentDocumentId || '');
   };
 
   const clearAllDocuments = async (): Promise<void> => {
@@ -114,6 +118,7 @@ export function useDocument() {
     createNewDocument,
     getCurrentDocument,
     updateCurrentDocument,
+    deleteDocument,
     deleteCurrentDocument,
     clearAllDocuments,
     selectDocument,
