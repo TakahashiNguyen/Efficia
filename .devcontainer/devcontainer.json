@@ -10,7 +10,7 @@
 				"PeterSchmalfeldt.explorer-exclude",
 				"vscodevim.vim",
 				"PKief.material-icon-theme",
-				"saoudrizwan.claude-dev"
+				"ms-playwright.playwright"
 			]
 		}
 	}

@@ -1,20 +1,14 @@
-import { v4 as uuidv4 } from 'uuid';
-
 /**
- * Generates a unique client ID based on random words string confirmation.
- * The client must provide a random word string to be confirmed by other clients.
+ * Generate a unique client ID for WebRTC connections
  */
 export function generateClientId(): string {
-  const words = ['quick', 'brown', 'fox', 'lazy', 'dog', 'cat', 'happy', 'jump', 'run', 'fast'];
-  const shuffledWords = [...words].sort(() => Math.random() - 0.5);
-  const wordString = shuffledWords.join(' ');
-  
-  return `${uuidv4()}|${wordString}`;
-}
-
-/**
- * Generates a unique session ID for WebSocket connections.
- */
-export function generateSessionId(): string {
-  return uuidv4();
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789abcdefghijklmnopqrstuvwxyz23456789'; // Removed confusing chars (0, O, 1, I)
+  let result = '';
+  for (let i = 1; i < 15; i++) {
+    if (i % 5 == 0)
+      result += '-'
+    else
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
 }
