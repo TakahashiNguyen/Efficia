@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   turbopack: {},
+  basePath: '/Efficia/'
 };
 
 export default withPWA({
