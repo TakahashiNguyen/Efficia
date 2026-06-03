@@ -1,23 +1,32 @@
 import { useCollaboration } from "@/hooks/useCollaboration";
 import { DocumentEditorProps } from "@/types/document";
+import { UserRole } from "@/types/webrtc";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import React from "react";
 
 import { EditorToolbar } from "./EditorToolbar";
 
-export const DocumentEditor: React.FC<DocumentEditorProps> = ({
+export const DocumentEditor: React.FC<
+  DocumentEditorProps & {
+    participants: string[];
+    userRole: UserRole;
+  }
+> = ({
   document,
   roomId,
   clientId,
+  participants,
+  userRole,
   updateCurrentDocument,
 }) => {
-  const { connected, participants } = useCollaboration(roomId);
+  const { connected } = useCollaboration();
 
   const editor = useEditor({
     extensions: [StarterKit],
     content: document.customHtml,
     immediatelyRender: true,
+    editable: userRole !== "viewer",
     onUpdate: ({ editor }) => {
       updateCurrentDocument({
         customHtml: editor.getHTML(),
@@ -75,7 +84,12 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
           `
         }
       >
-        {connected ? "CONNECTED" : "DISCONNECTED"} | Client: {clientId}
+        {userRole === "owner"
+          ? `Room ID for joining: ${roomId}`
+          : /* tx */ `
+              ${connected ? "CONNECTED" : "DISCONNECTED"} | Role: ${userRole} |
+              Client: ${clientId}
+            `.trim()}
       </div>
     </div>
   );

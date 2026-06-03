@@ -33,15 +33,39 @@ export function usePeerManager(
       setParticipants((prev) => new Set(prev).add(conn.peer));
       setConnectionStates((prev) => {
         const next = new Map(prev);
-        next.set(conn.peer, { connected: true });
+        next.set(conn.peer, { connected: true, role: "viewer" });
         return next;
       });
       onPeerConnected(conn.peer);
     });
 
     conn.on("data", (data: unknown) => {
-      if (typeof data === "object" && data !== null && "type" in data) {
-        onMessageReceived(conn.peer, data as CollaborationMessage);
+      if (typeof data === "object" && data !== null) {
+        const msg = data as CollaborationMessage;
+
+        if (msg.type === "permission-update") {
+          const { peerId, role } = msg.payload as { peerId: string; role: UserRole };
+          setConnectionStates((prev) => {
+            const next = new Map(prev);
+            const state = next.get(peerId);
+            if (state) {
+              next.set(peerId, { ...state, role });
+            }
+            return next;
+          });
+          return;
+        }
+
+        // Permission Validation: ignore updates from viewers
+        if (msg.type === "content-update" || msg.type === "cursor-move") {
+          const peerState = connectionStates.get(msg.senderId);
+          if (peerState?.role === "viewer") {
+            console.warn("Blocked update from viewer:", msg.senderId);
+            return;
+          }
+        }
+
+        onMessageReceived(conn.peer, msg);
       }
     });
 

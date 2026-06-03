@@ -1,9 +1,10 @@
 "use client";
 
+import { CollaborationControl } from "@/components/collaboration/CollaborationControl";
 import { DocumentBrowser } from "@/components/documents/DocumentBrowser";
+import { useCollaboration } from "@/hooks/useCollaboration";
 import { useDocument } from "@/hooks/useDocument";
 import { useRouter } from "next/navigation";
-import React from "react";
 
 export default function Home() {
   const {
@@ -15,6 +16,7 @@ export default function Home() {
   } = useDocument();
 
   const router = useRouter();
+  const { createRoom, joinRoom } = useCollaboration();
 
   const handleSelectDocument = (id: string) => {
     selectDocument(id);
@@ -27,7 +29,20 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-background min-h-screen">
+    <main className="bg-background flex min-h-screen flex-col">
+      <div className="bg-muted/20 flex items-center justify-between border-b p-4">
+        <h1 className="text-xl font-bold">Documents</h1>
+        <CollaborationControl
+          onCreateRoom={() => {
+            const rid = createRoom();
+            // Maybe redirect to a specific doc or just stay here
+          }}
+          onJoinRoom={(rid) => {
+            joinRoom(rid);
+            // After joining, we might want to go to a default doc or wait for selection
+          }}
+        />
+      </div>
       <DocumentBrowser
         documents={documents}
         onSelectDocument={handleSelectDocument}

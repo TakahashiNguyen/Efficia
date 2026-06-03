@@ -2,23 +2,70 @@ import { generateClientId } from "@/lib/clientId";
 import {
   ConnectionStateEventDetail,
   RoomJoinEventDetail,
+  UserRole,
 } from "@/types/webrtc";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export interface CollaborationState {
   connected: boolean;
   roomId?: string;
   clientId: string;
   participants: string[];
+  userRole: UserRole;
+  createRoom: () => void;
+  joinRoom: (roomId: string) => void;
 }
 
-export function useCollaboration(roomId?: string): CollaborationState {
-  const [state, setState] = useState<CollaborationState>({
+export function useCollaboration(): CollaborationState {
+  const [state, setState] = useState<{
+    connected: boolean;
+    roomId: string;
+    clientId: string;
+    participants: string[];
+    userRole: UserRole;
+  }>({
     connected: false,
-    roomId: roomId || "default-room",
+    roomId: "",
     clientId: generateClientId(),
     participants: [],
+    userRole: "viewer",
   });
+
+  const createRoom = useCallback(() => {
+    const newRoomId = Math.random().toString(36).substring(2, 9);
+    console.log("Creating room:", newRoomId);
+
+    // In a real implementation, this would trigger PeerJS to start hosting
+    // For now, we simulate the room join event for the owner
+    window.dispatchEvent(
+      new CustomEvent("room-join", {
+        detail: { roomId: newRoomId, participants: [] },
+      })
+    );
+
+    setState((prev) => ({
+      ...prev,
+      roomId: newRoomId,
+      userRole: "owner",
+    }));
+  }, []);
+
+  const joinRoom = useCallback((roomId: string) => {
+    console.log("Joining room:", roomId);
+
+    // Simulate joining a room
+    window.dispatchEvent(
+      new CustomEvent("room-join", {
+        detail: { roomId, participants: [] },
+      })
+    );
+
+    setState((prev) => ({
+      ...prev,
+      roomId,
+      userRole: "viewer",
+    }));
+  }, []);
 
   useEffect(() => {
     const handleRoomJoin = (event: CustomEvent<RoomJoinEventDetail>) => {
@@ -41,7 +88,6 @@ export function useCollaboration(roomId?: string): CollaborationState {
       }
     };
 
-    // Assuming there might be an event for participant changes
     const handleParticipantsUpdate = (
       event: CustomEvent<{ participants: string[] }>,
     ) => {
@@ -74,5 +120,13 @@ export function useCollaboration(roomId?: string): CollaborationState {
     };
   }, []);
 
-  return state;
+  return {
+    connected: state.connected,
+    roomId: state.roomId,
+    clientId: state.clientId,
+    participants: state.participants,
+    userRole: state.userRole,
+    createRoom,
+    joinRoom,
+  };
 }

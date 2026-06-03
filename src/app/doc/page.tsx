@@ -6,7 +6,6 @@ import { useCollaboration } from "@/hooks/useCollaboration";
 import { useDocument } from "@/hooks/useDocument";
 import { ChevronLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import React from "react";
 
 export default function DocumentPage() {
   const searchParams = useSearchParams();
@@ -17,9 +16,13 @@ export default function DocumentPage() {
 
   const currentDocument = id ? getCurrentDocument(id) : null;
 
-  const { connected, roomId, clientId } = useCollaboration(
-    currentDocument?.fileName,
-  );
+  const {
+    connected,
+    roomId,
+    clientId,
+    participants,
+    userRole,
+  } = useCollaboration();
 
   if (!currentDocument) {
     return (
@@ -41,16 +44,22 @@ export default function DocumentPage() {
 
   return (
     <div className="flex h-screen flex-col">
-      <div className="flex items-center gap-2 border-b p-2">
-        <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
-          <ChevronLeft className="mr-1 h-4 w-4" />
-          Back to Documents
-        </Button>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="font-medium">{currentDocument.fileName}</span>
-          <span className="text-muted-foreground">
-            ({connected ? "Connected" : "Disconnected"})
-          </span>
+      <div className="flex items-center justify-between border-b p-2">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
+            <ChevronLeft className="mr-1 h-4 w-4" />
+            Back to Documents
+          </Button>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-medium">{currentDocument.fileName}</span>
+            <div className="flex items-center gap-2">
+              {connected && (
+                <span className="text-muted-foreground">
+                  Connected: {roomId} ({userRole})
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       <div className="flex-1 overflow-hidden">
@@ -58,6 +67,8 @@ export default function DocumentPage() {
           document={currentDocument}
           roomId={roomId!}
           clientId={clientId!}
+          participants={participants}
+          userRole={userRole}
           updateCurrentDocument={updateCurrentDocument}
         />
       </div>
