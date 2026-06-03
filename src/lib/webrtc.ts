@@ -7,7 +7,7 @@ import {
   RoomState,
 } from "@/types/webrtc";
 import { DataConnection, Peer } from "peerjs";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Peer Manager Hook
@@ -27,7 +27,7 @@ export function usePeerManager(
   >(new Map());
   const [participants, setParticipants] = useState<Set<string>>(new Set());
 
-  const setupConnection = (conn: DataConnection) => {
+  const setupConnection = useCallback((conn: DataConnection) => {
     conn.on("open", () => {
       connectionsRef.current.set(conn.peer, conn);
       setParticipants((prev) => new Set(prev).add(conn.peer));
@@ -59,7 +59,7 @@ export function usePeerManager(
       });
       onPeerDisconnected(conn.peer);
     });
-  };
+  }, [onMessageReceived, onPeerConnected, onPeerDisconnected]);
 
   useEffect(() => {
     const peer = new Peer(clientId, {
@@ -84,7 +84,7 @@ export function usePeerManager(
     return () => {
       peer.destroy();
     };
-  }, [clientId]);
+  }, [clientId, setupConnection]);
 
   const connectToPeer = (peerId: string) => {
     if (peerRef.current) {
@@ -103,7 +103,7 @@ export function usePeerManager(
   };
 
   const broadcastMessage = (data: CollaborationMessage) => {
-    connectionsRef.current.forEach((conn, peerId) => {
+    connectionsRef.current.forEach((conn) => {
       conn.send(data);
     });
   };
@@ -127,7 +127,6 @@ export function useRoomManager(
   onDisconnected: (peerId: string) => void,
   onMessage: (peerId: string, data: CollaborationMessage) => void,
 ): RoomState {
-  const [roomConfig, setRoomConfig] = useState<RoomConfig>({ password: "" });
   const { connectionStates, participants } = usePeerManager(
     roomId,
     clientId,
@@ -139,7 +138,7 @@ export function useRoomManager(
   return {
     roomId,
     participants,
-    config: roomConfig,
+    config: { password: "" },
     connectionStates,
     isRoomActive: true,
   };

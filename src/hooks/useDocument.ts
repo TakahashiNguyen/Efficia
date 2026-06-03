@@ -143,7 +143,6 @@ export function useDocument() {
  * Hook for managing document editing state.
  */
 export function useDocumentEditing() {
-  const [isEditing, setIsEditing] = useState(false);
   const [editMode, setEditMode] = useState<"text" | "code">("text");
   const [cursorPosition, setCursorPosition] = useState({ line: 1, column: 1 });
 
@@ -156,7 +155,6 @@ export function useDocumentEditing() {
   };
 
   return {
-    isEditing,
     editMode,
     cursorPosition,
     toggleEditMode,

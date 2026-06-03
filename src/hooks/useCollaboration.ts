@@ -21,12 +21,6 @@ export function useCollaboration(roomId?: string): CollaborationState {
   });
 
   useEffect(() => {
-    if (roomId && state.roomId !== roomId) {
-      setState((prev) => ({ ...prev, roomId }));
-    }
-  }, [roomId, state.roomId]);
-
-  useEffect(() => {
     const handleRoomJoin = (event: CustomEvent<RoomJoinEventDetail>) => {
       console.log("Room joined:", event.detail.roomId);
       setState((prev) => ({
