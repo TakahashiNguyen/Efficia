@@ -8,8 +8,6 @@ import type { Document } from "@/types/document";
 import { useCallback, useEffect, useState } from "react";
 
 export function useDocument() {
-  // 1. SỬA LỖI: Khởi tạo State trực tiếp từ Storage (Lazy Initialization)
-  // Cách này giúp documents có dữ liệu NGAY LẬP TỨC ở lần render đầu tiên, không cần useEffect
   const [documents, setDocuments] = useState<Document[]>([]);
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(
     null,

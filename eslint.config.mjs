@@ -1,5 +1,7 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
+
+import unusedImports from "eslint-plugin-unused-imports";
 import nextTs from "eslint-config-next/typescript";
 
 const eslintConfig = defineConfig([
@@ -12,6 +14,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "src/components/ui/"
   ]),
   // Custom rules
   {

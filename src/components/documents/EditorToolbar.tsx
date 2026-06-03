@@ -31,7 +31,14 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
       data-testid="editor-toolbar"
     >
       <Tabs defaultValue="home" className="w-full">
-        <TabsList className="h-auto w-full justify-start rounded-none border-b border-none bg-transparent p-0 px-2">
+        <TabsList
+          className={
+            /* tw */ `
+              h-auto w-full justify-start rounded-none border-b border-none
+              bg-transparent p-0 px-2
+            `
+          }
+        >
           <HomeTagTrigger />
           <ReviewTabTrigger />
           <CollaborationTabTrigger />

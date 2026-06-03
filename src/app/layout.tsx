@@ -18,8 +18,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Efficia - Offline Collaborative Editor",
-  description:
-    "A powerful, offline-first collaborative editor for documents, spreadsheets, and presentations.",
+  description: /* tx */ `
+    A powerful, offline-first collaborative editor for documents, spreadsheets,
+    and presentations.
+  `.trim(),
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

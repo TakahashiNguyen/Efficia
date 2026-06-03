@@ -20,7 +20,12 @@ export function CollaborationTabTrigger() {
   return (
     <TabsTrigger
       value="collaboration"
-      className="data-[state=active]:border-primary rounded-none border-b-2 border-transparent data-[state=active]:bg-transparent"
+      className={
+        /* tw */ `
+          data-[state=active]:border-primary rounded-none border-b-2
+          border-transparent data-[state=active]:bg-transparent
+        `
+      }
     >
       Collaboration
     </TabsTrigger>
@@ -39,7 +44,12 @@ export const CollaborationTab: React.FC<CollaborationTabProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div
-              className={`h-2 w-2 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`}
+              className={
+                /* tw */ `
+                  h-2 w-2 rounded-full
+                  ${isConnected ? "bg-green-500" : "bg-red-500"}
+                `
+              }
             />
             <span className="text-muted-foreground text-sm">
               {isConnected ? "Connected to network" : "Disconnected"}
@@ -73,7 +83,14 @@ export const CollaborationTab: React.FC<CollaborationTabProps> = ({
                     <Tooltip key={peer}>
                       <TooltipTrigger asChild>
                         <div
-                          className="bg-primary text-primary-foreground border-background flex h-8 w-8 cursor-help items-center justify-center rounded-full border-2 text-xs font-medium"
+                          className={
+                            /* tw */ `
+                              bg-primary text-primary-foreground
+                              border-background flex h-8 w-8 cursor-help
+                              items-center justify-center rounded-full border-2
+                              text-xs font-medium
+                            `
+                          }
                           title={peer}
                         >
                           {peer.slice(0, 2).toUpperCase()}

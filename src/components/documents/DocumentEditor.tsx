@@ -29,7 +29,14 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   if (!editor) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+        <div
+          className={
+            /* tw */ `
+              border-primary h-8 w-8 animate-spin rounded-full border-4
+              border-t-transparent
+            `
+          }
+        />
       </div>
     );
   }
@@ -47,14 +54,26 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       />
 
       <div className="bg-muted/30 flex flex-1 justify-center overflow-y-auto p-8">
-        <div className="bg-background min-h-[297mm] w-full max-w-4xl p-[20mm] shadow-lg transition-all duration-300">
+        <div
+          className={
+            /* tw */ `
+              bg-background min-h-[297mm] w-full max-w-4xl p-[20mm] shadow-lg
+              transition-all duration-300
+            `
+          }
+        >
           <EditorContent editor={editor} />
         </div>
       </div>
 
       {/* Connection status bar at the bottom */}
       <div
-        className={`px-4 py-1 text-[10px] text-white transition-colors ${connected ? "bg-green-600" : "bg-red-600"}`}
+        className={
+          /* tw */ `
+            px-4 py-1 text-[10px] text-white transition-colors
+            ${connected ? "bg-green-600" : "bg-red-600"}
+          `
+        }
       >
         {connected ? "CONNECTED" : "DISCONNECTED"} | Client: {clientId}
       </div>

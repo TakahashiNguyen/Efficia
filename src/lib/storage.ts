@@ -45,7 +45,6 @@ export async function saveDocument(document: Document): Promise<void> {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(STORE_NAME, "readwrite");
     const store = transaction.objectStore(STORE_NAME);
-    // .put() automatically updates if the id (keyPath) already exists, or creates if it doesn't.
     const request = store.put(document);
 
     request.onsuccess = () => resolve();

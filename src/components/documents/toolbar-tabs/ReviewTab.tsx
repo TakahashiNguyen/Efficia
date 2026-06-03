@@ -15,7 +15,12 @@ export function ReviewTabTrigger() {
     <TabsTrigger
       value="review"
       data-testid="toolbar-tab-review"
-      className="data-[state=active]:border-primary rounded-none border-b-2 border-transparent data-[state=active]:bg-transparent"
+      className={
+        /* tw */ `
+          data-[state=active]:border-primary rounded-none border-b-2
+          border-transparent data-[state=active]:bg-transparent
+        `
+      }
     >
       Review
     </TabsTrigger>

@@ -15,7 +15,12 @@ export function HomeTagTrigger() {
     <TabsTrigger
       value="home"
       data-testid="toolbar-tab-home"
-      className="data-[state=active]:border-primary rounded-none border-b-2 border-transparent data-[state=active]:bg-transparent"
+      className={
+        /* tw */ `
+          data-[state=active]:border-primary rounded-none border-b-2
+          border-transparent data-[state=active]:bg-transparent
+        `
+      }
     >
       Home
     </TabsTrigger>

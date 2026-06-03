@@ -28,7 +28,14 @@ export const DocumentBrowser: React.FC<DocumentBrowserProps> = ({
   return (
     <TooltipProvider>
       <div className="mx-auto w-full max-w-7xl p-4 sm:p-8">
-        <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div
+          className={
+            /* tw */ `
+              mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row
+              sm:items-center
+            `
+          }
+        >
           <div className="text-center sm:text-left">
             <h1 className="text-3xl font-bold tracking-tight">My Documents</h1>
             <p className="text-muted-foreground">
@@ -53,7 +60,13 @@ export const DocumentBrowser: React.FC<DocumentBrowserProps> = ({
 
         {documents.length === 0 ? (
           <Card className="bg-muted/30 border-2 border-dashed">
-            <CardContent className="flex flex-col items-center justify-center py-32 text-center">
+            <CardContent
+              className={
+                /* tw */ `
+                  flex flex-col items-center justify-center py-32 text-center
+                `
+              }
+            >
               <div className="bg-muted mb-4 rounded-full p-4">
                 <FileSearch className="text-muted-foreground h-12 w-12" />
               </div>
@@ -69,11 +82,23 @@ export const DocumentBrowser: React.FC<DocumentBrowserProps> = ({
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div
+            className={
+              /* tw */ `
+                grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3
+                xl:grid-cols-4
+              `
+            }
+          >
             {documents.map((doc) => (
               <Card
                 key={doc.id}
-                className="group hover:border-primary cursor-pointer transition-all hover:shadow-md"
+                className={
+                  /* tw */ `
+                    group hover:border-primary cursor-pointer transition-all
+                    hover:shadow-md
+                  `
+                }
                 onClick={() => onSelectDocument(doc.id)}
               >
                 <CardContent className="flex h-full flex-col p-4 sm:p-5">
@@ -86,7 +111,13 @@ export const DocumentBrowser: React.FC<DocumentBrowserProps> = ({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-muted-foreground hover:text-destructive h-8 w-8 p-0 opacity-0 transition-opacity group-hover:opacity-100"
+                          className={
+                            /* tw */ `
+                              text-muted-foreground hover:text-destructive h-8
+                              w-8 p-0 opacity-0 transition-opacity
+                              group-hover:opacity-100
+                            `
+                          }
                           onClick={(e) => {
                             e.stopPropagation();
                             onDeleteDocument(doc.id);
