@@ -1,6 +1,7 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with
+code in this repository.
 
 ## Commands
 
@@ -31,6 +32,7 @@ src/
 ```
 
 **Target Routes**:
+
 - `/doc/` → Document editor (.docx support)
 - `/excel/` → Spreadsheet editor (.xlsx support)
 - `/ppt/` → Presentation editor (.pptx support)
@@ -38,11 +40,13 @@ src/
 ## Dependencies
 
 ### Frontend Stack
+
 - **Next.js**: "^16.2.6" - App Router, Server Components
 - **React**: "^19.x" - UI components
 - **TypeScript**: "^5.x" - Type safety
 
 ### Styling
+
 - **Tailwind CSS** 4.x - Utility-first styling with custom theme setup
 
 ## Offline-First Implementation
@@ -59,7 +63,8 @@ src/
    - Sync status flags
    - Last accessed timestamps
 
-3. **WebSocket messages** use localStorage with `to:` field for recipient identification
+3. **WebSocket messages** use localStorage with `to:` field for recipient
+   identification
 
 ### WebSocket Handling
 
@@ -76,9 +81,9 @@ src/
 
 ```typescript
 // tests/__mocks__/websocketServer.ts
-import { createConnection } from './websocket-server';
+import { createConnection } from "./websocket-server";
 
-describe('WebSocket Server', () => {
+describe("WebSocket Server", () => {
   let conn: any;
 
   beforeEach(async () => {
@@ -94,14 +99,16 @@ describe('WebSocket Server', () => {
     }
   });
 
-  it('should handle incoming messages', async () => {
+  it("should handle incoming messages", async () => {
     // Mock message handlers
-    expect(() => { /* test */ }).toThrow();
+    expect(() => {
+      /* test */
+    }).toThrow();
   });
 
-  it('should handle outgoing messages with recipient field', async () => {
-    const mockId = 'test-recipient-id';
-    const msg = { type: 'sync', data, to: mockId };
+  it("should handle outgoing messages with recipient field", async () => {
+    const mockId = "test-recipient-id";
+    const msg = { type: "sync", data, to: mockId };
     // Verify message format validation
   });
 });
@@ -124,16 +131,16 @@ describe('Offline Editor App', () => {
   it('should accept user ID for notifications', () => {
     const mockId = 'test-recipient-id';
     render(<MyApp onMessage={handleMessage} />);
-    
+
     screen.getByRole('button').click();
-    
+
     expect(screen.getByLabelText(/recipient/)).toBeInTheDocument();
   });
 
   it('should handle disconnected state properly', () => {
     const mockWs = jest.fn().mockImplementation(() => null);
     render(<MyApp ws={mockWs} />);
-    
+
     expect(mockWs).toBeDefined();
   });
 });
@@ -141,16 +148,17 @@ describe('Offline Editor App', () => {
 
 ## Key Files to Understand and Modify
 
-| File | Purpose | Changes Needed |
-|------|---------|----------------|
-| `src/app/layout.tsx` | Layout configuration with Geist fonts | Update metadata, adjust body styles |
-| `src/app/globals.css` | Global styles + Tailwind integration | Add document-specific utilities |
-| `src/app/page.tsx` | Main entry point for routing | Separate `/doc/`, `/excel/`, `/ppt/` routes |
-| `next.config.ts` | Build configuration | Remove Vercel-specific config if not needed |
+| File                  | Purpose                               | Changes Needed                              |
+| --------------------- | ------------------------------------- | ------------------------------------------- |
+| `src/app/layout.tsx`  | Layout configuration with Geist fonts | Update metadata, adjust body styles         |
+| `src/app/globals.css` | Global styles + Tailwind integration  | Add document-specific utilities             |
+| `src/app/page.tsx`    | Main entry point for routing          | Separate `/doc/`, `/excel/`, `/ppt/` routes |
+| `next.config.ts`      | Build configuration                   | Remove Vercel-specific config if not needed |
 
 ## Deployment Requirements
 
 ### VPS Specifications
+
 - **CPU**: 2+ cores minimum (for Socket.io server)
 - **RAM**: 2GB minimum
 - **Network**: Public IP for WebSocket access
@@ -176,7 +184,9 @@ Testing Strategy
 
 ## Important Notes
 
-1. **No third-party document parsing libraries** needed - use native Node.js APIs since documents are stored locally
-2. **All client-side operations** should be optimized for large IndexedDB records (BLOBs)
+1. **No third-party document parsing libraries** needed - use native Node.js
+   APIs since documents are stored locally
+2. **All client-side operations** should be optimized for large IndexedDB
+   records (BLOBs)
 3. **WebSocket reconnection logic** must handle network partitions gracefully
 4. **Session tokens** should use UUIDv4 format to avoid conflicts

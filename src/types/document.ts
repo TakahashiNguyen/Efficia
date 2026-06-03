@@ -1,4 +1,4 @@
-export type DocumentType = 'word' | 'powerpoint' | 'excel';
+export type DocumentType = "word" | "powerpoint" | "excel";
 
 /**
  * Custom HTML tag structure for storing document content.
@@ -14,7 +14,7 @@ export interface CustomTag {
  * Simple text node for custom tag system.
  */
 export interface TextNode {
-  type: 'text';
+  type: "text";
   content: string;
 }
 
@@ -31,6 +31,15 @@ export interface Document {
   customHtml: string;
   // Standard HTML for display purposes
   renderedHtml?: string;
+  // Collaboration setting
+  isShared: boolean;
+}
+
+export interface DocumentEditorProps {
+  document: Document;
+  roomId: string;
+  clientId: string;
+  updateCurrentDocument: (updates: Partial<Document>) => Promise<void>;
 }
 
 export interface ClientSession {

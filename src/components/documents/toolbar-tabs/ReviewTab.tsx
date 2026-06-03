@@ -1,9 +1,10 @@
-import React from 'react';
-import { Undo, Redo } from 'lucide-react';
-import { Editor } from '@tiptap/react';
-import { Separator } from '@/components/ui/separator';
-import { ToolbarButton } from './ToolbarButton';
-import { TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from "@/components/ui/separator";
+import { TabsContent, TabsTrigger } from "@/components/ui/tabs";
+import { Editor } from "@tiptap/react";
+import { Redo, Undo } from "lucide-react";
+import React from "react";
+
+import { ToolbarButton } from "./ToolbarButton";
 
 interface ReviewTabProps {
   editor: Editor;
@@ -14,18 +15,20 @@ export function ReviewTabTrigger() {
     <TabsTrigger
       value="review"
       data-testid="toolbar-tab-review"
-      className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+      className="data-[state=active]:border-primary rounded-none border-b-2 border-transparent data-[state=active]:bg-transparent"
     >
       Review
     </TabsTrigger>
-  )
+  );
 }
 
 export const ReviewTab: React.FC<ReviewTabProps> = ({ editor }) => {
   return (
-    <TabsContent value="review" className="m-0 p-1 flex items-center gap-1 overflow-x-auto">
-
-      <Separator orientation="vertical" className="h-6 mx-1" />
+    <TabsContent
+      value="review"
+      className="m-0 flex items-center gap-1 overflow-x-auto p-1"
+    >
+      <Separator orientation="vertical" className="mx-1 h-6" />
       <ToolbarButton
         onClick={() => editor.chain().focus().undo().run()}
         isActive={false}

@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
-import { Peer, DataConnection } from 'peerjs';
 import {
-  RoomConfig,
-  PeerConnectionState,
-  RoomState,
-  RoomJoinEventDetail,
+  CollaborationMessage,
   ConnectionStateEventDetail,
-  CollaborationMessage
-} from '@/types/webrtc';
+  PeerConnectionState,
+  RoomConfig,
+  RoomJoinEventDetail,
+  RoomState,
+} from "@/types/webrtc";
+import { DataConnection, Peer } from "peerjs";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Peer Manager Hook
@@ -18,18 +18,20 @@ export function usePeerManager(
   clientId: string,
   onMessageReceived: (peerId: string, data: CollaborationMessage) => void,
   onPeerConnected: (peerId: string) => void,
-  onPeerDisconnected: (peerId: string) => void
+  onPeerDisconnected: (peerId: string) => void,
 ) {
   const peerRef = useRef<Peer | null>(null);
   const connectionsRef = useRef<Map<string, DataConnection>>(new Map());
-  const [connectionStates, setConnectionStates] = useState<Map<string, PeerConnectionState>>(new Map());
+  const [connectionStates, setConnectionStates] = useState<
+    Map<string, PeerConnectionState>
+  >(new Map());
   const [participants, setParticipants] = useState<Set<string>>(new Set());
 
   const setupConnection = (conn: DataConnection) => {
-    conn.on('open', () => {
+    conn.on("open", () => {
       connectionsRef.current.set(conn.peer, conn);
-      setParticipants(prev => new Set(prev).add(conn.peer));
-      setConnectionStates(prev => {
+      setParticipants((prev) => new Set(prev).add(conn.peer));
+      setConnectionStates((prev) => {
         const next = new Map(prev);
         next.set(conn.peer, { connected: true });
         return next;
@@ -37,20 +39,20 @@ export function usePeerManager(
       onPeerConnected(conn.peer);
     });
 
-    conn.on('data', (data: unknown) => {
-      if (typeof data === 'object' && data !== null && 'type' in data) {
+    conn.on("data", (data: unknown) => {
+      if (typeof data === "object" && data !== null && "type" in data) {
         onMessageReceived(conn.peer, data as CollaborationMessage);
       }
     });
 
-    conn.on('close', () => {
+    conn.on("close", () => {
       connectionsRef.current.delete(conn.peer);
-      setParticipants(prev => {
+      setParticipants((prev) => {
         const next = new Set(prev);
         next.delete(conn.peer);
         return next;
       });
-      setConnectionStates(prev => {
+      setConnectionStates((prev) => {
         const next = new Map(prev);
         next.delete(conn.peer);
         return next;
@@ -66,17 +68,17 @@ export function usePeerManager(
 
     peerRef.current = peer;
 
-    peer.on('connection', (conn) => {
-      console.log('Incoming connection from:', conn.peer);
+    peer.on("connection", (conn) => {
+      console.log("Incoming connection from:", conn.peer);
       setupConnection(conn);
     });
 
-    peer.on('error', (err) => {
-      console.error('PeerJS error:', err);
+    peer.on("error", (err) => {
+      console.error("PeerJS error:", err);
     });
 
-    peer.on('open', (id) => {
-      console.log('My peer ID is: ' + id);
+    peer.on("open", (id) => {
+      console.log("My peer ID is: " + id);
     });
 
     return () => {
@@ -96,7 +98,7 @@ export function usePeerManager(
     if (conn) {
       conn.send(data);
     } else {
-      console.error('No connection found for peer:', peerId);
+      console.error("No connection found for peer:", peerId);
     }
   };
 
@@ -123,15 +125,15 @@ export function useRoomManager(
   clientId: string,
   onConnected: (peerId: string) => void,
   onDisconnected: (peerId: string) => void,
-  onMessage: (peerId: string, data: CollaborationMessage) => void
+  onMessage: (peerId: string, data: CollaborationMessage) => void,
 ): RoomState {
-  const [roomConfig, setRoomConfig] = useState<RoomConfig>({ password: '' });
+  const [roomConfig, setRoomConfig] = useState<RoomConfig>({ password: "" });
   const { connectionStates, participants } = usePeerManager(
     roomId,
     clientId,
     onMessage,
     onConnected,
-    onDisconnected
+    onDisconnected,
   );
 
   return {
@@ -147,7 +149,7 @@ export function useRoomManager(
  * Room configuration state with password validation
  */
 export function useRoomConfig(): RoomConfig {
-  const [config, setConfig] = useState<RoomConfig>({ password: '' });
+  const [config, setConfig] = useState<RoomConfig>({ password: "" });
 
   useEffect(() => {
     const handleRoomJoin = (event: CustomEvent<RoomJoinEventDetail>) => {
@@ -156,8 +158,9 @@ export function useRoomConfig(): RoomConfig {
       }
     };
 
-    window.addEventListener('room-join', handleRoomJoin as EventListener);
-    return () => window.removeEventListener('room-join', handleRoomJoin as EventListener);
+    window.addEventListener("room-join", handleRoomJoin as EventListener);
+    return () =>
+      window.removeEventListener("room-join", handleRoomJoin as EventListener);
   }, []);
 
   return config;
@@ -167,21 +170,32 @@ export function useRoomConfig(): RoomConfig {
  * Connection state manager for tracking peer connections in a room
  */
 export function useConnectionStates(): Map<string, { connected: boolean }> {
-  const [states, setStates] = useState<Map<string, { connected: boolean }>>(new Map());
+  const [states, setStates] = useState<Map<string, { connected: boolean }>>(
+    new Map(),
+  );
 
   useEffect(() => {
-    const handleConnectionState = (event: CustomEvent<ConnectionStateEventDetail>) => {
-      if (event.detail && event.detail.type === 'connection-state') {
-        setStates(prev => {
+    const handleConnectionState = (
+      event: CustomEvent<ConnectionStateEventDetail>,
+    ) => {
+      if (event.detail && event.detail.type === "connection-state") {
+        setStates((prev) => {
           const next = new Map(prev);
-          next.set('local', { connected: true });
+          next.set("local", { connected: true });
           return next;
         });
       }
     };
 
-    window.addEventListener('connection-state', handleConnectionState as EventListener);
-    return () => window.removeEventListener('connection-state', handleConnectionState as EventListener);
+    window.addEventListener(
+      "connection-state",
+      handleConnectionState as EventListener,
+    );
+    return () =>
+      window.removeEventListener(
+        "connection-state",
+        handleConnectionState as EventListener,
+      );
   }, []);
 
   return states;

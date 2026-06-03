@@ -1,9 +1,14 @@
-import React from 'react';
-import { FileText, Plus, Trash2, FileSearch } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Document } from '@/types/document';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Document } from "@/types/document";
+import { FileSearch, FileText, Plus, Trash2 } from "lucide-react";
+import React from "react";
 
 interface DocumentBrowserProps {
   documents: Document[];
@@ -22,64 +27,72 @@ export const DocumentBrowser: React.FC<DocumentBrowserProps> = ({
 }) => {
   return (
     <TooltipProvider>
-      <div className="max-w-7xl mx-auto w-full p-4 sm:p-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+      <div className="mx-auto w-full max-w-7xl p-4 sm:p-8">
+        <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div className="text-center sm:text-left">
             <h1 className="text-3xl font-bold tracking-tight">My Documents</h1>
-            <p className="text-muted-foreground">Manage and organize your collaborative files.</p>
+            <p className="text-muted-foreground">
+              Manage and organize your collaborative files.
+            </p>
           </div>
-          <div className="flex gap-3 w-full sm:w-auto justify-center">
-            <Button variant="outline" size="sm" onClick={onClearAll} className="text-destructive hover:bg-destructive/10">
+          <div className="flex w-full justify-center gap-3 sm:w-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onClearAll}
+              className="text-destructive hover:bg-destructive/10"
+            >
               Clear All
             </Button>
             <Button onClick={onCreateNewDocument} className="gap-2">
-              <Plus className="w-4 h-4" />
+              <Plus className="h-4 w-4" />
               New Document
             </Button>
           </div>
         </div>
 
         {documents.length === 0 ? (
-          <Card className="border-2 border-dashed bg-muted/30">
+          <Card className="bg-muted/30 border-2 border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-32 text-center">
-              <div className="bg-muted p-4 rounded-full mb-4">
-                <FileSearch className="w-12 h-12 text-muted-foreground" />
+              <div className="bg-muted mb-4 rounded-full p-4">
+                <FileSearch className="text-muted-foreground h-12 w-12" />
               </div>
               <h3 className="text-lg font-medium">No documents found</h3>
               <p className="text-muted-foreground mb-6 max-w-xs">
-                You haven{'\''}t created any documents yet. Start by creating your first one!
+                You haven{"'"}t created any documents yet. Start by creating
+                your first one!
               </p>
               <Button onClick={onCreateNewDocument} className="gap-2">
-                <Plus className="w-4 h-4" />
+                <Plus className="h-4 w-4" />
                 Create Your First Document
               </Button>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {documents.map((doc) => (
               <Card
                 key={doc.id}
-                className="group cursor-pointer hover:border-primary transition-all hover:shadow-md"
+                className="group hover:border-primary cursor-pointer transition-all hover:shadow-md"
                 onClick={() => onSelectDocument(doc.id)}
               >
-                <CardContent className="p-4 sm:p-5 flex flex-col h-full">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                      <FileText className="w-6 h-6" />
+                <CardContent className="flex h-full flex-col p-4 sm:p-5">
+                  <div className="mb-4 flex items-start justify-between">
+                    <div className="bg-primary/10 text-primary rounded-lg p-2">
+                      <FileText className="h-6 w-6" />
                     </div>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                          className="text-muted-foreground hover:text-destructive h-8 w-8 p-0 opacity-0 transition-opacity group-hover:opacity-100"
                           onClick={(e) => {
                             e.stopPropagation();
                             onDeleteDocument(doc.id);
                           }}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Delete document</TooltipContent>
@@ -89,13 +102,13 @@ export const DocumentBrowser: React.FC<DocumentBrowserProps> = ({
                   <div className="flex-1">
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <h3 className="font-semibold text-sm truncate mb-1">
+                        <h3 className="mb-1 truncate text-sm font-semibold">
                           {doc.fileName}
                         </h3>
                       </TooltipTrigger>
                       <TooltipContent>{doc.fileName}</TooltipContent>
                     </Tooltip>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {new Date(doc.createdAt).toLocaleDateString()}
                     </p>
                   </div>

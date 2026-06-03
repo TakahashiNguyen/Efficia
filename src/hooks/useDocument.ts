@@ -1,14 +1,19 @@
-'use client';
-
-import { useState, useEffect, useCallback, useRef } from 'react';
-import type { Document } from '@/types/document';
-import { getStoredDocuments, saveDocument, removeDocument, clearAll } from '@/lib/storage';
+import {
+  clearAll,
+  getStoredDocuments,
+  removeDocument,
+  saveDocument,
+} from "@/lib/storage";
+import type { Document } from "@/types/document";
+import { useCallback, useEffect, useState } from "react";
 
 export function useDocument() {
   // 1. SỬA LỖI: Khởi tạo State trực tiếp từ Storage (Lazy Initialization)
   // Cách này giúp documents có dữ liệu NGAY LẬP TỨC ở lần render đầu tiên, không cần useEffect
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null);
+  const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,7 +26,7 @@ export function useDocument() {
           setCurrentDocumentId(storedDocs[0].id);
         }
       } catch (error) {
-        console.error('Failed to load documents:', error);
+        console.error("Failed to load documents:", error);
       } finally {
         setLoading(false);
       }
@@ -32,48 +37,56 @@ export function useDocument() {
   const createNewDocument = (): Document => {
     const newDoc: Document = {
       id: crypto.randomUUID(),
-      type: 'word',
+      type: "word",
       fileName: `untitled-${Date.now()}.docx`,
       createdAt: new Date(),
-      customHtml: '',
-      renderedHtml: '',
+      customHtml: "",
+      renderedHtml: "",
+      isShared: false,
     };
 
-    setDocuments(prev => [...prev, newDoc]);
+    setDocuments((prev) => [...prev, newDoc]);
     setCurrentDocumentId(newDoc.id);
     return newDoc;
   };
 
   const getCurrentDocument = (id?: string): Document | null => {
     if (id) {
-      return documents.find(d => d.id === id) || null;
+      return documents.find((d) => d.id === id) || null;
     }
     if (!currentDocumentId) return null;
-    return documents.find(d => d.id === currentDocumentId) || null;
+    return documents.find((d) => d.id === currentDocumentId) || null;
   };
 
-  const updateCurrentDocument = useCallback(async (updates: Partial<Document>): Promise<void> => {
-    if (!currentDocumentId) return;
+  const updateCurrentDocument = useCallback(
+    async (updates: Partial<Document>): Promise<void> => {
+      if (!currentDocumentId) return;
 
-    setDocuments(prev => {
-      const next = prev.map(d => d.id === currentDocumentId ? { ...d, ...updates } : d);
+      setDocuments((prev) => {
+        const next = prev.map((d) =>
+          d.id === currentDocumentId ? { ...d, ...updates } : d,
+        );
 
-      // Trigger async save to IndexedDB
-      const activeDoc = next.find(d => d.id === currentDocumentId);
-      if (activeDoc) {
-        saveDocument(activeDoc).catch(err => console.error('Auto-save failed:', err));
-      }
+        // Trigger async save to IndexedDB
+        const activeDoc = next.find((d) => d.id === currentDocumentId);
+        if (activeDoc) {
+          saveDocument(activeDoc).catch((err) =>
+            console.error("Auto-save failed:", err),
+          );
+        }
 
-      return next;
-    });
-  }, [currentDocumentId]);
+        return next;
+      });
+    },
+    [currentDocumentId],
+  );
 
   const deleteDocument = async (id: string): Promise<boolean> => {
     try {
       const success = await removeDocument(id);
 
       if (success) {
-        const remainingDocs = documents.filter(d => d.id !== id);
+        const remainingDocs = documents.filter((d) => d.id !== id);
         setDocuments(remainingDocs);
 
         if (id === currentDocumentId) {
@@ -93,7 +106,7 @@ export function useDocument() {
   };
 
   const deleteCurrentDocument = async (): Promise<boolean> => {
-    return deleteDocument(currentDocumentId || '');
+    return deleteDocument(currentDocumentId || "");
   };
 
   const clearAllDocuments = async (): Promise<void> => {
@@ -102,7 +115,7 @@ export function useDocument() {
       setDocuments([]);
       setCurrentDocumentId(null);
     } catch (error) {
-      console.error('Failed to clear documents:', error);
+      console.error("Failed to clear documents:", error);
     }
   };
 
@@ -133,10 +146,10 @@ export function useDocument() {
  */
 export function useDocumentEditing() {
   const [isEditing, setIsEditing] = useState(false);
-  const [editMode, setEditMode] = useState<'text' | 'code'>('text');
+  const [editMode, setEditMode] = useState<"text" | "code">("text");
   const [cursorPosition, setCursorPosition] = useState({ line: 1, column: 1 });
 
-  const toggleEditMode = (mode: 'text' | 'code'): void => {
+  const toggleEditMode = (mode: "text" | "code"): void => {
     setEditMode(mode);
   };
 

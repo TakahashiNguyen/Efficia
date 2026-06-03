@@ -17,17 +17,18 @@ export interface RoomState {
 export interface RoomJoinEventDetail {
   roomId: string;
   password?: string;
+  participants: string[];
 }
 
 export interface CollaborationMessage {
-  type: 'content-update' | 'cursor-move' | 'presence-update';
+  type: "content-update" | "cursor-move" | "presence-update";
   payload: string | number | boolean | Record<string, unknown>;
   senderId: string;
   timestamp: number;
 }
 
 export interface ConnectionStateEventDetail {
-  type: 'connection-state' | 'connection-closed';
+  type: "connection-state" | "connection-closed";
   peerId: string;
   data?: CollaborationMessage;
 }

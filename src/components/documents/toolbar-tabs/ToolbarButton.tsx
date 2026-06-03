@@ -1,7 +1,11 @@
-import React from 'react';
-import { Editor } from '@tiptap/react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import React from "react";
 
 interface ToolbarButtonProps {
   onClick: () => void;
@@ -22,7 +26,7 @@ export const ToolbarButton: React.FC<ToolbarButtonProps> = ({
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant={isActive ? 'secondary' : 'ghost'}
+          variant={isActive ? "secondary" : "ghost"}
           size="sm"
           onClick={onClick}
           className="h-8 w-8 p-0"

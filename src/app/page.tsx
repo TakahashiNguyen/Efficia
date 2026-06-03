@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useDocument } from '@/hooks/useDocument';
-import { DocumentBrowser } from '@/components/documents/DocumentBrowser';
-import { useRouter } from 'next/navigation';
+import { DocumentBrowser } from "@/components/documents/DocumentBrowser";
+import { useDocument } from "@/hooks/useDocument";
+import { useRouter } from "next/navigation";
+import React from "react";
 
 export default function Home() {
   const {
@@ -27,7 +27,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="bg-background min-h-screen">
       <DocumentBrowser
         documents={documents}
         onSelectDocument={handleSelectDocument}
