@@ -2,7 +2,7 @@
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
     "*": "$(basename).spec.*, $(basename).spec.util.*, $(basename).cye.*, $(basename).cyc.*, $(basename).client.*, $(basename).util.*, $(basename).e2e.cy.*",
-    "package.json": "LICENSE*,*.md,.gitignore,.env*,.*rc,*.config.js,*.config.ts,*.config.json,*.config.mjs,*.config.cjs,*.config.yaml,*.config.yml,*lock.yaml,*file,manifest.json",
+    "package.json": "LICENSE*,*.md,.gitignore,.env*,.*rc,*.config.js,*.config.ts,*.config.json,*.config.mjs,*.config.cjs,*.config.yml,*.yaml,*file,*.json",
     "*config.json": "$(capture)config.*.json"
   },
   "files.exclude": {
@@ -22,11 +22,17 @@
     "next-env.d.ts": true,
     "src/graphQL": true,
     "**/release": true,
-    "update": true
+    "update": true,
+    "out": true,
+    "playwright-report": true,
+    "**/tsconfig.tsbuildinfo": true,
+    "**/test-results": true
   },
   "svg.preview.background": "transparent",
   "explorerExclude.backup": {},
-  "editor.rulers": [80],
+  "editor.rulers": [
+    80
+  ],
   "editor.wordWrap": "on",
   "typescript.tsserver.log": "verbose",
   "editor.foldingImportsByDefault": true

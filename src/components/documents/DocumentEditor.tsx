@@ -32,6 +32,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   const editor = useEditor({
     extensions: [StarterKit],
     content: document.customHtml,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       updateCurrentDocument({ customHtml: html });
