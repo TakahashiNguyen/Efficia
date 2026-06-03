@@ -9,8 +9,7 @@
 			"extensions": [
 				"PeterSchmalfeldt.explorer-exclude",
 				"vscodevim.vim",
-				"PKief.material-icon-theme",
-				"ms-playwright.playwright"
+				"PKief.material-icon-theme"
 			]
 		}
 	}
