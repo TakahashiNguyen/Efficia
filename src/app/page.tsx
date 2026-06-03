@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { CollaborationControl } from "@/components/collaboration/CollaborationControl";
 import { DocumentBrowser } from "@/components/documents/DocumentBrowser";

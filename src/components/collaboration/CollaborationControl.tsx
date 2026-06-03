@@ -14,7 +14,7 @@ export function CollaborationControl({
 
   return (
     <div className="flex items-center gap-2">
-      {!mode === "join" ? (
+      {mode !== "join" ? (
         <div className="flex items-center gap-2">
           <button
             className={

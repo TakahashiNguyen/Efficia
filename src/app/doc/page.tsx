@@ -6,6 +6,7 @@ import { useCollaboration } from "@/hooks/useCollaboration";
 import { useDocument } from "@/hooks/useDocument";
 import { ChevronLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function DocumentPage() {
   const searchParams = useSearchParams();
@@ -13,7 +14,6 @@ export default function DocumentPage() {
   const id = searchParams.get("id");
 
   const { getCurrentDocument, updateCurrentDocument } = useDocument();
-
   const currentDocument = id ? getCurrentDocument(id) : null;
 
   const {
@@ -22,7 +22,19 @@ export default function DocumentPage() {
     clientId,
     participants,
     userRole,
+    createRoom,
+    joinRoom,
   } = useCollaboration();
+
+  useEffect(() => {
+    if (currentDocument && !connected) {
+      if (!currentDocument.isShared) {
+        createRoom(currentDocument.id);
+      } else {
+        joinRoom(currentDocument.id);
+      }
+    }
+  }, [currentDocument, connected, createRoom, joinRoom]);
 
   if (!currentDocument) {
     return (

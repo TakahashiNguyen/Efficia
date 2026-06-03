@@ -1,22 +1,39 @@
+"use client";
+
 import { generateClientId } from "@/lib/clientId";
+import { RoomJoinEventDetail, UserRole } from "@/types/webrtc";
 import {
-  ConnectionStateEventDetail,
-  RoomJoinEventDetail,
-  UserRole,
-} from "@/types/webrtc";
-import { useEffect, useState, useCallback } from "react";
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 export interface CollaborationState {
   connected: boolean;
-  roomId?: string;
+  roomId: string;
   clientId: string;
   participants: string[];
   userRole: UserRole;
-  createRoom: () => void;
+  createRoom: (roomId?: string) => void;
   joinRoom: (roomId: string) => void;
+  updatePeerRole: (peerId: string, role: UserRole) => void;
 }
 
-export function useCollaboration(): CollaborationState {
+interface CollaborationContextType {
+  state: CollaborationState;
+}
+
+const CollaborationContext = createContext<
+  CollaborationContextType | undefined
+>(undefined);
+
+export function CollaborationProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [state, setState] = useState<{
     connected: boolean;
     roomId: string;
@@ -31,8 +48,8 @@ export function useCollaboration(): CollaborationState {
     userRole: "viewer",
   });
 
-  const createRoom = useCallback(() => {
-    const newRoomId = Math.random().toString(36).substring(2, 9);
+  const createRoom = useCallback((id?: string) => {
+    const newRoomId = id || Math.random().toString(36).substring(2, 9);
     console.log("Creating room:", newRoomId);
 
     // In a real implementation, this would trigger PeerJS to start hosting
@@ -40,7 +57,7 @@ export function useCollaboration(): CollaborationState {
     window.dispatchEvent(
       new CustomEvent("room-join", {
         detail: { roomId: newRoomId, participants: [] },
-      })
+      }),
     );
 
     setState((prev) => ({
@@ -57,7 +74,7 @@ export function useCollaboration(): CollaborationState {
     window.dispatchEvent(
       new CustomEvent("room-join", {
         detail: { roomId, participants: [] },
-      })
+      }),
     );
 
     setState((prev) => ({
@@ -65,6 +82,11 @@ export function useCollaboration(): CollaborationState {
       roomId,
       userRole: "viewer",
     }));
+  }, []);
+
+  const updatePeerRole = useCallback((peerId: string, role: UserRole) => {
+    // In a real implementation, this would send a message to other peers
+    console.log(`Updating peer ${peerId} role to ${role}`);
   }, []);
 
   useEffect(() => {
@@ -78,55 +100,30 @@ export function useCollaboration(): CollaborationState {
       }));
     };
 
-    const handleConnectionState = (
-      event: CustomEvent<ConnectionStateEventDetail>,
-    ) => {
-      if (event.detail.type === "connection-state") {
-        setState((prev) => ({ ...prev, connected: true }));
-      } else if (event.detail.type === "connection-closed") {
-        setState((prev) => ({ ...prev, connected: false }));
-      }
-    };
-
-    const handleParticipantsUpdate = (
-      event: CustomEvent<{ participants: string[] }>,
-    ) => {
-      setState((prev) => ({
-        ...prev,
-        participants: event.detail.participants,
-      }));
-    };
-
     window.addEventListener("room-join", handleRoomJoin as EventListener);
-    window.addEventListener(
-      "connection-state",
-      handleConnectionState as EventListener,
-    );
-    window.addEventListener(
-      "participants-update",
-      handleParticipantsUpdate as EventListener,
-    );
-
     return () => {
       window.removeEventListener("room-join", handleRoomJoin as EventListener);
-      window.removeEventListener(
-        "connection-state",
-        handleConnectionState as EventListener,
-      );
-      window.removeEventListener(
-        "participants-update",
-        handleParticipantsUpdate as EventListener,
-      );
     };
   }, []);
 
-  return {
-    connected: state.connected,
-    roomId: state.roomId,
-    clientId: state.clientId,
-    participants: state.participants,
-    userRole: state.userRole,
-    createRoom,
-    joinRoom,
+  const value = {
+    state: {
+      ...state,
+      createRoom,
+      joinRoom,
+      updatePeerRole,
+    },
   };
+
+  return <CollaborationContext.Provider value={value}>{children}</CollaborationContext.Provider>;
+}
+
+export function useCollaboration(): CollaborationState {
+  const context = useContext(CollaborationContext);
+  if (context === undefined) {
+    throw new Error(
+      "useCollaboration must be used within a CollaborationProvider",
+    );
+  }
+  return context.state;
 }
