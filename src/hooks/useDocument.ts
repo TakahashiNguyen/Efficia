@@ -44,7 +44,10 @@ export function useDocument() {
     return newDoc;
   };
 
-  const getCurrentDocument = (): Document | null => {
+  const getCurrentDocument = (id?: string): Document | null => {
+    if (id) {
+      return documents.find(d => d.id === id) || null;
+    }
     if (!currentDocumentId) return null;
     return documents.find(d => d.id === currentDocumentId) || null;
   };
