@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "release": "semantic-release",
+    "cypress:install": "cypress install",
+    "cypress": "cypress open",
     "vibe": "openclaude"
   },
   "dependencies": {
@@ -41,6 +43,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cypress": "^15.16.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "pptxgenjs": "^4.0.1",
