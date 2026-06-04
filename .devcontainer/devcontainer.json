@@ -10,7 +10,8 @@
         "PeterSchmalfeldt.explorer-exclude",
         "vscodevim.vim",
         "PKief.material-icon-theme",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss"
       ]
     }
   }

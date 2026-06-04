@@ -11,20 +11,7 @@ interface ReviewTabProps {
 }
 
 export function ReviewTabTrigger() {
-  return (
-    <TabsTrigger
-      value="review"
-      data-testid="toolbar-tab-review"
-      className={
-        /* tw */ `
-          data-[state=active]:border-primary rounded-none border-b-2
-          border-transparent data-[state=active]:bg-transparent
-        `
-      }
-    >
-      Review
-    </TabsTrigger>
-  );
+  return <TabsTrigger value="review">Review</TabsTrigger>;
 }
 
 export const ReviewTab: React.FC<ReviewTabProps> = ({ editor }) => {

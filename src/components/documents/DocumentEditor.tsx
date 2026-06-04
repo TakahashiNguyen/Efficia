@@ -56,7 +56,7 @@ export const DocumentEditor: React.FC<
         editor={editor}
         collaborationProps={{
           participants,
-          onConnectToPeer: () => {}, // Implement as needed
+          onConnectToPeer: () => {},
           clientId,
           isConnected: connected,
         }}
